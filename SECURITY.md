@@ -43,6 +43,14 @@ you open with Cursor.
 Set `failClosed: true` on security-critical hooks so crashes/timeouts block the
 action instead of failing open ([hooks docs](https://cursor.com/docs/hooks)).
 
+**`failClosed` cuts both ways.** A hook that crashes, times out, or prints
+nothing blocks the operation — so a broken security hook is not a missed check,
+it is an agent that cannot submit a prompt. Every hook here is therefore pure
+bash and `grep` with no interpreter dependency, avoids `set -e`, carries an
+explicit `timeout`, and prints exactly one JSON object on every path.
+`scripts/validate-starter.sh` enforces all of that, and CI runs it with
+`python3` removed to prove it. See [.cursor/hooks/README.md](./.cursor/hooks/README.md).
+
 ## MCP
 
 - Committed `mcp.json` stays **empty** — safe clone

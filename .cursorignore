@@ -1,4 +1,4 @@
-﻿# Block access entirely — @-mentions included.
+# Block access entirely — @-mentions included.
 # .cursorignore is NOT a security boundary (see SECURITY.md).
 # Pair with hooks, approvals, and filesystem permissions.
 

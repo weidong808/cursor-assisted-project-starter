@@ -4,30 +4,35 @@
     "beforeSubmitPrompt": [
       {
         "command": "bash .cursor/hooks/scan-prompt.sh",
-        "failClosed": true
+        "failClosed": true,
+        "timeout": 10
       }
     ],
     "beforeReadFile": [
       {
         "command": "bash .cursor/hooks/scan-secrets.sh",
-        "failClosed": false
+        "failClosed": false,
+        "timeout": 10
       }
     ],
     "beforeShellExecution": [
       {
         "command": "bash .cursor/hooks/guard-command.sh",
-        "failClosed": false
+        "failClosed": false,
+        "timeout": 10
       }
     ],
     "beforeMCPExecution": [
       {
         "command": "bash .cursor/hooks/guard-mcp.sh",
-        "failClosed": true
+        "failClosed": true,
+        "timeout": 10
       }
     ],
     "afterFileEdit": [
       {
-        "command": "bash .cursor/hooks/audit-edit.sh"
+        "command": "bash .cursor/hooks/audit-edit.sh",
+        "timeout": 10
       }
     ]
   }

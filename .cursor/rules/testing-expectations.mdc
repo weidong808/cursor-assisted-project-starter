@@ -1,6 +1,6 @@
 ---
 description: Testing expectations when changing logic, calculations, or bug fixes
-globs: "**/*.test.*, **/*.spec.*, **/tests/**, **/__tests__/**"
+globs: **/*.test.*,**/*.spec.*,**/tests/**,**/__tests__/**
 alwaysApply: false
 ---
 

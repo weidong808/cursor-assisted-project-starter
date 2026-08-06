@@ -32,7 +32,7 @@ blocked_patterns=(
 
 for pattern in "${blocked_patterns[@]}"; do
   if printf '%s' "$input" | grep -Eiq "$pattern" 2>/dev/null; then
-    emit '{"permission":"deny","user_message":"Blocked by repository safety guard. Review and run manually only with explicit authorization."}'
+    emit '{"permission":"deny","user_message":"Blocked by repository safety guard. Review and run manually only with explicit authorization.","agent_message":"That command matches a destructive pattern blocked by .cursor/hooks/guard-command.sh. Do not retry it or work around the guard. Propose a narrower, reversible alternative and ask the user to run anything irreversible themselves."}'
   fi
 done
 

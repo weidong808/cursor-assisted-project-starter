@@ -119,6 +119,64 @@ assert_hook "allows ordinary file read" .cursor/hooks/scan-secrets.sh \
 assert_hook "empty payload still answers" .cursor/hooks/scan-prompt.sh \
   '' '"continue":true'
 
+# ------------------------------------------------------------- file hygiene --
+
+# A UTF-8 BOM makes the first line of a config file not match what it looks like.
+# .cursorignore shipped with one; its first pattern was silently a different string.
+while IFS= read -r f; do
+  if [[ "$(head -c 3 "$f" | od -An -tx1 | tr -d ' \n')" == "efbbbf" ]]; then
+    printf 'File starts with a UTF-8 BOM: %s\n' "$f"
+    failed=1
+  fi
+done < <(git ls-files 2>/dev/null || find . -type f -not -path './.git/*')
+
+# ------------------------------------------------------------------- rules --
+
+# Quoted globs are parsed as ONE malformed pattern, so the rule never attaches
+# and fails silently. Cursor wants bare comma-separated values.
+while IFS= read -r rule; do
+  if ! grep -q '^description:' "$rule"; then
+    printf 'Rule missing description (needed for agent-requested rules): %s\n' "$rule"
+    failed=1
+  fi
+  if ! grep -q '^alwaysApply:' "$rule"; then
+    printf 'Rule missing alwaysApply: %s\n' "$rule"
+    failed=1
+  fi
+  globs_line="$(grep -m1 '^globs:' "$rule" || true)"
+  if [[ -n "$globs_line" ]]; then
+    if printf '%s' "$globs_line" | grep -q '["'"'"']'; then
+      printf 'Rule has QUOTED globs (parsed as one bad pattern, never matches): %s\n' "$rule"
+      failed=1
+    fi
+    if printf '%s' "$globs_line" | grep -q ', '; then
+      printf 'Rule has a space after a glob comma (breaks the pattern): %s\n' "$rule"
+      failed=1
+    fi
+  fi
+done < <(find .cursor/rules -name '*.mdc' | sort)
+
+# --------------------------------------------------------------- subagents --
+
+while IFS= read -r agent; do
+  for field in name description; do
+    if ! grep -q "^${field}:" "$agent"; then
+      printf 'Subagent missing %s: %s\n' "$field" "$agent"
+      failed=1
+    fi
+  done
+done < <(find .cursor/agents -name '*.md' | sort)
+
+# ------------------------------------------------------------------ hooks --
+
+# Every hook command referenced in hooks.json must actually exist.
+while IFS= read -r ref; do
+  if [[ ! -f "$ref" ]]; then
+    printf 'hooks.json references a missing script: %s\n' "$ref"
+    failed=1
+  fi
+done < <(grep -oE '\.cursor/hooks/[A-Za-z0-9_.-]+\.sh' .cursor/hooks.json | sort -u)
+
 # ------------------------------------------------------------------ content --
 
 while IFS= read -r skill_file; do

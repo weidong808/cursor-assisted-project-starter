@@ -1,0 +1,39 @@
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate starter (with python3 available)
+        run: bash scripts/validate-starter.sh
+
+      # The bug this repo was fixed for: hooks that shell out to python3 print
+      # nothing where it is missing, and a failClosed hook turns that silence
+      # into a locked agent. Prove the whole thing still works without it.
+      - name: Validate starter (no python3 on PATH)
+        run: |
+          mkdir -p /tmp/nopy
+          printf '#!/bin/sh\nexit 127\n' > /tmp/nopy/python3
+          chmod +x /tmp/nopy/python3
+          PATH=/tmp/nopy:/usr/bin:/bin bash scripts/validate-starter.sh
+
+  validate-windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      # Git Bash on a Windows checkout is where CRLF line endings and missing
+      # python3 actually bite. If it passes here, it passes for the reader.
+      - name: Validate starter (Git Bash)
+        run: bash scripts/validate-starter.sh

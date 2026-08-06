@@ -32,6 +32,11 @@ cd cursor-assisted-project-starter
 bash scripts/validate-starter.sh
 ```
 
+`validate-starter.sh` needs only `bash` and `grep` — Git Bash on Windows is
+enough. It checks structure, rule frontmatter, skill naming, and it **executes
+every hook** to confirm each one answers. CI runs it on Linux, on Windows under
+Git Bash, and again with `python3` removed from `PATH`.
+
 Then open in Cursor → **Customize** → confirm rules, skills, and agents loaded.
 
 ## File guide
@@ -51,6 +56,7 @@ Then open in Cursor → **Customize** → confirm rules, skills, and agents load
 | `.cursor/skills/*` | Trim or extend workflows |
 | `.cursor/agents/*` | Tune delegation descriptions |
 | `.cursor/hooks/*` | Add blocked commands; swap audit for formatter |
+| `scripts/validate-starter.sh` | Add checks for your own invariants |
 | `.cursor/mcp.example.json` | Pin reviewed MCP packages |
 | ignore files | Secrets → block; vendor/build → de-index |
 
@@ -61,7 +67,7 @@ Details: [ADOPT.md](./ADOPT.md) · hook behavior: [.cursor/hooks/README.md](./.c
 - **Specific over generic** — verifiable commands and constraints
 - **Scoped over giant** — rules and skills attach where they matter
 - **Advisory + deterministic** — markdown for judgment, scripts for invariants
-- **Safe by default** — empty MCP, no secrets, hooks fail open except explicit denies
+- **Safe by default** — empty MCP, no secrets; prompt and MCP guards fail *closed*, the rest fail open
 - **Human accountable** — agent proposes; team reviews and owns the result
 
 ## LinkedIn post mapping (optional)

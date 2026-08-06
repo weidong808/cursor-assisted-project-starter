@@ -23,7 +23,7 @@ tool_name="$(printf '%s' "$input" \
 credential_pattern='AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9_]{20,}|sk_(live|test)_[0-9a-zA-Z]{16,}|xox[abposr]-[A-Za-z0-9-]{10,}|-----BEGIN( [A-Z]+)* PRIVATE KEY-----'
 
 if printf '%s' "$input" | grep -Eq "$credential_pattern" 2>/dev/null; then
-  emit "{\"permission\":\"deny\",\"user_message\":\"MCP tool ${tool_name} blocked: arguments appear to contain live credentials. Pass env var names, not values.\"}"
+  emit "{\"permission\":\"deny\",\"user_message\":\"MCP tool ${tool_name} blocked: arguments appear to contain live credentials. Pass env var names, not values.\",\"agent_message\":\"The arguments to ${tool_name} contain what looks like a live credential. Never pass secret values through tool arguments — reference the env var name instead and let the server read it.\"}"
 fi
 
 emit '{"permission":"allow"}'
