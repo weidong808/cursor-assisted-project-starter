@@ -1,39 +1,26 @@
 # Handoff — cursor-assisted-project-starter
 
-Companion repo for the **Seven Files That Never Ship to Production** LinkedIn
-post. Cross-read
-`weidong-website/docs/linkedin-cursor-structure/HANDOFF.md` for the full
-three-surface publish chain (A → C → publish → B).
+**Status: finalized** — Cursor-accurate reference template. Post copy is separate;
+refine on `weidong-website` when ready.
 
-## Status
+## For agents
 
-**Repo:** https://github.com/weidong808/cursor-assisted-project-starter  
-**Visibility:** public  
-**Validate:** `bash scripts/validate-starter.sh` (includes hook smoke tests)
-
-## Contract with the post
-
-| Path | Status |
+| Doc | Use |
 | --- | --- |
-| `AGENTS.md` | Filled for this starter; runtime TODOs are for forking into app repos |
-| `.cursor/rules/` | 3 scoped `.mdc` files + 1 global baseline |
-| `.cursor/mcp.json` | Empty (safe default) + `mcp.example.json` (GitHub/Sentry/Linear via env) |
-| `.cursor/commands/` | `/code-review`, `/ship` |
-| `.cursor/skills/` | Auto `release-readiness` + manual `ship-check` (`disable-model-invocation`) |
-| `.cursor/agents/` | `code-reviewer`, `security-auditor` (readonly) |
-| `.cursor/hooks.json` | `beforeShellExecution`, `beforeReadFile`, `afterFileEdit` |
-| `.cursorignore` / `.cursorindexingignore` | Block vs de-index split from post item 7 |
+| [README.md](./README.md) | Overview and file guide |
+| [ADOPT.md](./ADOPT.md) | Copy into app repos (ArchLens, hub site, etc.) |
+| [AGENTS.md](./AGENTS.md) | Operating manual — rewrite per target app |
+| [.cursor/hooks/README.md](./.cursor/hooks/README.md) | Hook behavior and smoke tests |
 
-Hooks live in `.cursor/hooks/` per Cursor convention. `guard-command.sh` parses
-JSON stdin (required by the hooks spec — raw-text parsing does not work).
+**Validate:** `bash scripts/validate-starter.sh`
 
-## Not in scope
+## Publish chain (website)
 
-- **`projects.ts` on weidong-shi.com** — template repo only; linked from the post
-  first comment, not listed as a Work app.
-- **Hub card** — website handoff task 5 after LinkedIn publish (`videos.ts` entry).
+See `weidong-website/docs/linkedin-cursor-structure/HANDOFF.md` for A → C → publish → B.
+This repo is surface **C**. Not listed in `projects.ts` — linked from the post first comment only.
 
 ## Constraints
 
-- No secrets in git. Hooks are not a security boundary.
-- Small enough to read in ten minutes — a reference, not a framework.
+- No secrets in git
+- Skill folder name must match `name:` in frontmatter
+- Keep the template readable in ~10 minutes — reference, not a framework

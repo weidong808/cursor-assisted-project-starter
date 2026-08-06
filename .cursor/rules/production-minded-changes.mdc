@@ -1,14 +1,13 @@
 ---
-description: Production-minded implementation standards
-globs:
-  - "**/*"
+description: Production-minded implementation standards for every change
 alwaysApply: true
 ---
 
 # Production-minded changes
 
-- Inspect neighboring code and tests before editing.
+- Read neighboring code and tests before editing.
 - Follow existing architecture and naming unless the task explicitly changes them.
+- Prefer the smallest change that fully solves the task.
 - Validate at system boundaries; keep domain logic independent of transport details.
 - Handle failures explicitly without exposing secrets or internal implementation details.
 - Add or update tests for observable behavior, including meaningful failure cases.

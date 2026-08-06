@@ -1,9 +1,6 @@
 ---
-description: API and integration boundary conventions
-globs:
-  - "**/api/**"
-  - "**/routes/**"
-  - "**/handlers/**"
+description: API and integration boundary conventions for routes and handlers
+globs: "**/api/**, **/routes/**, **/handlers/**, **/actions/**"
 alwaysApply: false
 ---
 

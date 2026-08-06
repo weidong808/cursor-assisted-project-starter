@@ -1,106 +1,86 @@
 # Cursor-Assisted Project Starter
 
-A production-minded, reusable control layer for Cursor projects — the companion
-repo for **Seven Files That Never Ship to Production** (AI in Action).
+Production-minded Cursor control layer you can copy into any repository.
 
-Most teams repeatedly explain architecture, conventions, tests, and safety
-boundaries to their coding agent. This starter moves that knowledge into the
-repository so Cursor can begin each task with useful context and deterministic
-guardrails.
+Most teams re-explain architecture, conventions, tests, and safety boundaries on
+every agent session. This starter encodes them once — rules, skills, subagents,
+hooks, and ignore boundaries — so Cursor starts with useful context and
+deterministic guardrails.
 
-## Map to the post
+**Adopting in your app?** Start with [ADOPT.md](./ADOPT.md).
 
-The LinkedIn caption lists **seven ideas**; the card lists **seven rows**. Item 4
-combines `commands/` and `skills/`; item 7 splits into `.cursorignore` and
-`.cursorindexingignore`. This repo implements all of them.
+## What's in the box
 
-| Post # | Card tag | What to open in this repo |
+| Surface | Location | Cursor behavior |
 | --- | --- | --- |
-| 1 | CONTEXT | `AGENTS.md` |
-| 2 | BEHAVIOR | `.cursor/rules/` (3 scoped `.mdc` examples) |
-| 3 | TOOLS | `.cursor/mcp.json` (empty) + `.cursor/mcp.example.json` |
-| 4 | WORKFLOW | `.cursor/commands/` **and** `.cursor/skills/` |
-| 5 | DELEGATION | `.cursor/agents/` |
-| 6 | ENFORCEMENT | `.cursor/hooks.json` → `.cursor/hooks/*.sh` |
-| 7 | BOUNDARY | `.cursorignore` + `.cursorindexingignore` |
+| Context | `AGENTS.md` | Operating manual (rewrite per app) |
+| Rules | `.cursor/rules/*.mdc` | Always-on + file-scoped behavior |
+| Commands | `.cursor/commands/*.md` | `/code-review`, `/ship` |
+| Skills | `.cursor/skills/*/SKILL.md` | Auto-loaded or manual-only expertise |
+| Subagents | `.cursor/agents/*.md` | Isolated reviewers (readonly) |
+| MCP | `.cursor/mcp.json` + example | Team tool connections via env vars |
+| Hooks | `.cursor/hooks.json` + scripts | Enforcement — shell guard, secret scan, edit audit |
+| Boundaries | `.cursorignore`, `.cursorindexingignore` | Block vs de-index |
 
-**Rules are advice. Hooks are enforcement.** Rules tell the agent what to do;
-hooks in this repo veto destructive shell commands, block reads of likely secrets,
-and audit agent edits.
+**Rules advise. Hooks enforce.** That split is intentional.
 
-## Start here
+## Quick start
 
-1. Use this repository as a template or copy the `.cursor/` tree into an existing project.
-2. Read `AGENTS.md`, then run `bash scripts/validate-starter.sh`.
-3. Copy `.cursor/mcp.example.json` into a local MCP config; set env vars from `.env.example`.
-4. When forking into an app repo, replace the runtime command section in `AGENTS.md`.
-5. Delete examples you do not need — focused context beats more context.
-6. Ask Cursor to read `AGENTS.md` and propose project-specific refinements before coding.
+```bash
+git clone https://github.com/weidong808/cursor-assisted-project-starter.git
+cd cursor-assisted-project-starter
+bash scripts/validate-starter.sh
+```
 
-## File guide — what each piece does
+Then open in Cursor → **Customize** → confirm rules, skills, and agents loaded.
 
-| Path | Purpose | Customize when |
-| --- | --- | --- |
-| `AGENTS.md` | Operating manual, architecture, commands, definition of done | Always — first file to rewrite for your stack |
-| `.cursor/rules/production-minded-changes.mdc` | Global baseline (`alwaysApply: true`) | Tune boundaries for your team |
-| `.cursor/rules/api-boundaries.mdc` | API/route conventions (glob-scoped) | Point globs at your API paths |
-| `.cursor/rules/testing-expectations.mdc` | Test quality bar (glob-scoped) | Match your test layout |
-| `.cursor/commands/code-review.md` | `/code-review` workflow | Align with your review checklist |
-| `.cursor/commands/ship.md` | `/ship` workflow | Point at your real validation commands |
-| `.cursor/skills/release-readiness/SKILL.md` | Auto-loaded release expertise | Trim for your deploy model |
-| `.cursor/skills/ship-check/SKILL.md` | Manual-only skill (`disable-model-invocation: true`) | Shows skills-as-commands pattern |
-| `.cursor/agents/code-reviewer.md` | Read-only correctness reviewer | Adjust focus areas |
-| `.cursor/agents/security-auditor.md` | Read-only security reviewer | Add org-specific threat model |
-| `.cursor/mcp.json` | Committed team MCP config | Add pinned servers after review |
-| `.cursor/mcp.example.json` | GitHub / Sentry / Linear shape with env vars | Replace placeholder packages |
-| `.cursor/hooks/guard-command.sh` | `beforeShellExecution` — blocks destructive commands | Add org-specific shell patterns |
-| `.cursor/hooks/scan-secrets.sh` | `beforeReadFile` — blocks likely secret reads | Tighten patterns for your stack |
-| `.cursor/hooks/audit-edit.sh` | `afterFileEdit` — append-only edit log | Swap for a real formatter if you have one |
-| `.cursorignore` | Block agent access (including @-mentions) | List secret and vendor paths |
-| `.cursorindexingignore` | De-index without blocking reads | List generated / vendored trees |
-| `scripts/validate-starter.sh` | Self-check for structure, JSON, and hook behavior | Extend for your app's CI commands |
+## File guide
 
-## What is included
+| Path | Customize when |
+| --- | --- |
+| `AGENTS.md` | **Always first** — stack, architecture, real commands |
+| `production-minded-changes.mdc` | Rarely — global baseline |
+| `protect-sensitive-paths.mdc` | Add app-specific sensitive paths |
+| `api-boundaries.mdc` | Point globs at your API/actions layer |
+| `testing-expectations.mdc` | Point globs at your test files |
+| `.cursor/commands/*` | Align with your review/ship checklist |
+| `.cursor/skills/*` | Trim or extend workflows |
+| `.cursor/agents/*` | Tune delegation descriptions |
+| `.cursor/hooks/*` | Add blocked commands; swap audit for formatter |
+| `.cursor/mcp.example.json` | Pin reviewed MCP packages |
+| ignore files | Secrets → block; vendor/build → de-index |
 
-- Three scoped rules plus one global baseline
-- `/code-review` and `/ship` commands
-- Auto-loaded `release-readiness` and manual-only `ship-check` skills
-- Read-only `code-reviewer` and `security-auditor` subagents
-- Empty committed `mcp.json` plus a multi-server example using env vars
-- Three working hooks (shell guard, secret scan, edit audit)
-- Ignore split demonstrated concretely
-- `.env.example`, validation script, and contribution guidance
+Details: [ADOPT.md](./ADOPT.md) · hook behavior: [.cursor/hooks/README.md](./.cursor/hooks/README.md)
 
 ## Design principles
 
-- **Specific over generic:** encode commands and constraints that can be verified.
-- **Scoped over giant:** attach rules and expertise only where they matter.
-- **Advisory plus deterministic:** use instructions for judgment and scripts for invariants.
-- **Safe by default:** no secrets, destructive commands, or automatic external writes.
-- **Human accountable:** the agent proposes; the team reviews and owns the result.
+- **Specific over generic** — verifiable commands and constraints
+- **Scoped over giant** — rules and skills attach where they matter
+- **Advisory + deterministic** — markdown for judgment, scripts for invariants
+- **Safe by default** — empty MCP, no secrets, hooks fail open except explicit denies
+- **Human accountable** — agent proposes; team reviews and owns the result
 
-## Security notes
+## LinkedIn post mapping (optional)
 
-`mcp.json` ships empty so cloning is safe. Enable MCP only after pinning packages
-and setting env vars locally. Never commit API keys, tokens, private URLs, customer
-data, or machine-specific paths.
+Companion repo for *Seven Files That Never Ship to Production* (AI in Action). The
+post combines commands+skills as one idea and splits ignore into two files — this
+repo implements every surface. Post copy may change; this repo is the source of
+truth for Cursor behavior.
 
-Hooks improve consistency, but they are not a security boundary. Keep branch
-protection, CI checks, code review, secret scanning, and least-privilege credentials
-in place.
+## Security
 
-## Official references
+`mcp.json` ships empty. Enable MCP only after pinning packages and setting env vars
+from `.env.example`. Hooks are not a security boundary — keep CI, branch protection,
+and secret scanning in place.
+
+## References
 
 - [Cursor Rules](https://cursor.com/docs/rules)
-- [Cursor Agent Skills](https://cursor.com/docs/skills)
-- [Cursor Subagents](https://cursor.com/docs/subagents)
-- [Cursor MCP](https://cursor.com/docs/mcp)
-- [Cursor Hooks](https://cursor.com/docs/hooks)
+- [Agent Skills](https://cursor.com/docs/skills)
+- [Subagents](https://cursor.com/docs/subagents)
+- [MCP](https://cursor.com/docs/mcp)
+- [Hooks](https://cursor.com/docs/hooks)
 
 ## License
 
-MIT
-
----
-
-Built by [Weidong Shi](https://weidong-shi.com) as part of **AI in Action**.
+MIT — [Weidong Shi](https://weidong-shi.com) · **AI in Action**

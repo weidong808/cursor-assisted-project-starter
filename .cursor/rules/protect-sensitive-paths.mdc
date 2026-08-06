@@ -1,0 +1,12 @@
+---
+description: Guardrails for secrets, lockfiles, CI, auth, billing, and migrations
+alwaysApply: true
+---
+
+# Protect sensitive paths
+
+- Never edit `.env`, lockfiles, CI/workflow config, database migrations, auth, or billing without showing the change and getting approval.
+- Never print secrets or pull credential values into the model context.
+- Do not import a package unless it already exists in the project's manifest (`package.json`, `requirements.txt`, etc.).
+- Do not call a function, prop, hook, or endpoint you have not located in the repo — stop and say so instead of inventing it.
+- Before a large agent session, prefer a clean working tree (commit or stash) so unexpected rewrites are easy to revert.

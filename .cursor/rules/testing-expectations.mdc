@@ -1,16 +1,13 @@
 ---
-description: Testing expectations for behavior changes
-globs:
-  - "**/*.test.*"
-  - "**/*.spec.*"
-  - "**/tests/**"
-  - "**/__tests__/**"
+description: Testing expectations when changing logic, calculations, or bug fixes
+globs: "**/*.test.*, **/*.spec.*, **/tests/**, **/__tests__/**"
 alwaysApply: false
 ---
 
 # Testing expectations
 
 - Prefer tests that assert observable behavior over implementation details.
+- For calculations, money, scoring, validation, and bug fixes: write a failing test first when practical.
 - Cover meaningful failure paths, not only the happy path.
-- Do not weaken assertions or delete tests to make a change pass.
+- Do not delete, skip, or loosen assertions to make a change pass — explain and ask first.
 - Name tests after the behavior under protection so failures are actionable.
