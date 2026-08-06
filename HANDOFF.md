@@ -10,7 +10,7 @@ post. Written for the next agent to pick up; cross-read
 | ----------------------------------------------- | ------------------------------------------ |
 | **A.** `weidong-website/docs/linkedin-cursor-structure/` — post package | ✅ complete (see website handoff) |
 | **B.** `weidong-website/src/` — hub integration | ❌ not started (website handoff task 5)    |
-| **C.** this repo — starter                      | ✅ public, cloneable                        |
+| **C.** this repo — starter                      | ✅ public — `validate-starter.sh` passes |
 
 They depend on each other. The post (A) promises this repo in its first comment
 and on the card footer, so **C gates publication**. The hub card (B) needs a
@@ -48,16 +48,10 @@ post can ship as written.
 
 ### Remaining work here
 
-1. **Fork customization** — replace `AGENTS.md` TODOs with real stack/commands
-   when copying into a real project (expected; not a publish blocker).
-2. **Optional depth** — website handoff section C lists aspirational content
-   (3–4 rules, `/code-review` + `/ship`, `security-auditor`, `.cursorignore`).
-   Add only what strengthens the clone-and-run story without bloating the template.
-3. **After publish** — no hub card lives in this repo. Hub integration is
-   website handoff task 5: copy `cursor-structure.gif` to
-   `public/images/videos/` and prepend to `src/content/videos.ts`. Use the GIF,
-   not the PNG. Listing this repo in `projects.ts` is an explicit judgement
-   call — every current project is a running app with an `externalUrl`.
+1. **Fork customization** — replace runtime `TODO` commands in `AGENTS.md` when
+   copying into a real project (expected).
+2. **After publish (website task 5)** — prepend hub entry to `videos.ts` with the
+   live lnkd.in URL; GIF already staged on the site.
 
 ## Constraints
 

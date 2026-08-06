@@ -2,34 +2,34 @@
 
 ## Mission
 
-Build and maintain this project with small, reviewable, production-minded changes.
+This repository is a **Cursor control-layer starter** — seven configuration surfaces
+that turn a generic coding agent into a project-aware partner. Fork it, replace the
+TODOs, and delete examples you do not need.
 
 ## Before editing
 
-1. Read the relevant code, tests, and repository guidance.
+1. Read the relevant `.cursor/` files and this manual.
 2. State assumptions when requirements are ambiguous.
 3. Prefer the smallest change that fully solves the task.
 4. Preserve public behavior unless the task explicitly changes it.
 
 ## Architecture
 
-- Application entry point: `TODO`
-- Core domain code: `TODO`
-- External integrations: `TODO`
-- Tests: `TODO`
-- Architecture decisions: `TODO`
-
-Update this section before using the starter in a real project.
+- Operating manual: `AGENTS.md`
+- Scoped rules: `.cursor/rules/*.mdc`
+- Workflows: `.cursor/commands/` (`/code-review`, `/ship`)
+- Expertise: `.cursor/skills/` (see `ship-check` for `disable-model-invocation`)
+- Specialists: `.cursor/agents/` (`code-reviewer`, `security-auditor`)
+- External tools: `.cursor/mcp.json` (copy from `mcp.example.json` when ready)
+- Enforcement: `.cursor/hooks.json` → `scripts/guard-command.sh`
+- Boundaries: `.cursorignore` (block) and `.cursorindexingignore` (de-index)
 
 ## Commands
 
-- Install: `TODO`
-- Develop: `TODO`
-- Format: `TODO`
-- Lint: `TODO`
-- Type-check: `TODO`
-- Test: `TODO`
-- Build: `TODO`
+- Validate structure: `bash scripts/validate-starter.sh`
+- Install (when you add a runtime): `TODO`
+- Test (when you add a runtime): `TODO`
+- Lint / format / build: `TODO` — set these when copying into a real project
 
 Never invent a command. Inspect package or build files first.
 
@@ -47,7 +47,7 @@ Never invent a command. Inspect package or build files first.
 A change is complete when:
 
 - the requested behavior is implemented;
-- relevant tests cover success and important failure paths;
+- relevant tests cover success and important failure paths (when tests exist);
 - formatting, lint, types, tests, and build pass where applicable;
 - security, privacy, accessibility, observability, and rollback impact were considered;
 - documentation changed when behavior or operation changed;

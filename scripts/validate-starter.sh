@@ -3,12 +3,20 @@ set -euo pipefail
 
 required=(
   "AGENTS.md"
+  ".cursorignore"
+  ".cursorindexingignore"
   ".cursor/rules/production-minded-changes.mdc"
-  ".cursor/commands/review-change.md"
+  ".cursor/rules/api-boundaries.mdc"
+  ".cursor/rules/testing-expectations.mdc"
+  ".cursor/commands/code-review.md"
+  ".cursor/commands/ship.md"
   ".cursor/skills/release-readiness/SKILL.md"
+  ".cursor/skills/ship-check/SKILL.md"
   ".cursor/agents/code-reviewer.md"
+  ".cursor/agents/security-auditor.md"
   ".cursor/mcp.json"
   ".cursor/hooks.json"
+  "scripts/guard-command.sh"
 )
 
 failed=0
@@ -31,8 +39,13 @@ if grep -RIEq '(api[_-]?key|secret|token)[[:space:]]*[:=][[:space:]]*["'"'"'][A-
   failed=1
 fi
 
+if ! grep -q 'disable-model-invocation: true' .cursor/skills/ship-check/SKILL.md; then
+  printf 'Missing disable-model-invocation example in ship-check skill.\n'
+  failed=1
+fi
+
 if grep -RIn 'TODO' AGENTS.md >/dev/null; then
-  printf 'Customization required: replace TODO values in AGENTS.md.\n'
+  printf 'Customization note: replace TODO runtime commands in AGENTS.md when forking.\n'
 fi
 
 if [[ "$failed" -ne 0 ]]; then

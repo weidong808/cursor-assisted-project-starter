@@ -1,0 +1,8 @@
+# De-index only — files stay readable when explicitly requested.
+# Put vendored and generated output here.
+
+node_modules/
+dist/
+build/
+coverage/
+.git/

@@ -1,0 +1,9 @@
+﻿# Block access entirely — @-mentions included.
+# Put secrets and credentials here.
+
+.env
+.env.*
+*.pem
+*.key
+*.p12
+.cursor/mcp.local.json

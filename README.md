@@ -15,6 +15,7 @@ Most teams repeatedly explain architecture, conventions, tests, and safety bound
 | `.cursor/agents/` | Focused specialists with isolated responsibilities |
 | `.cursor/mcp.json` | Safe, project-level connections to external tools |
 | `.cursor/hooks.json` | Deterministic checks around agent actions |
+| `.cursorignore` / `.cursorindexingignore` | Block vs de-index boundaries |
 
 ## Start here
 
@@ -28,12 +29,13 @@ Most teams repeatedly explain architecture, conventions, tests, and safety bound
 ## What is included
 
 - A concise operating manual
-- A scoped rule for production-minded changes
-- A reusable review command
-- A release-readiness skill
-- A read-only code-review subagent
+- A scoped rule for production-minded changes plus API and testing examples
+- `/code-review` and `/ship` commands
+- Release-readiness and manual-only `ship-check` skills
+- Read-only code-review and security-auditor subagents
 - A disabled-by-default MCP example using environment variables
 - Hooks plus portable validation scripts
+- `.cursorignore` and `.cursorindexingignore` with the block vs de-index split
 - A starter self-check and contribution guidance
 
 ## Design principles

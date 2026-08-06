@@ -1,0 +1,16 @@
+---
+description: Testing expectations for behavior changes
+globs:
+  - "**/*.test.*"
+  - "**/*.spec.*"
+  - "**/tests/**"
+  - "**/__tests__/**"
+alwaysApply: false
+---
+
+# Testing expectations
+
+- Prefer tests that assert observable behavior over implementation details.
+- Cover meaningful failure paths, not only the happy path.
+- Do not weaken assertions or delete tests to make a change pass.
+- Name tests after the behavior under protection so failures are actionable.
