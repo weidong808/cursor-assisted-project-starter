@@ -1,13 +1,24 @@
 {
   "mcpServers": {
-    "project-docs": {
+    "github": {
       "command": "npx",
-      "args": [
-        "-y",
-        "REPLACE_WITH_A_REVIEWED_AND_PINNED_MCP_PACKAGE"
-      ],
+      "args": ["-y", "@modelcontextprotocol/server-github"],
       "env": {
-        "API_TOKEN": "${env:PROJECT_DOCS_API_TOKEN}"
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${env:GITHUB_PERSONAL_ACCESS_TOKEN}"
+      }
+    },
+    "sentry": {
+      "command": "npx",
+      "args": ["-y", "REPLACE_WITH_PINNED_SENTRY_MCP_PACKAGE"],
+      "env": {
+        "SENTRY_AUTH_TOKEN": "${env:SENTRY_AUTH_TOKEN}"
+      }
+    },
+    "linear": {
+      "command": "npx",
+      "args": ["-y", "REPLACE_WITH_PINNED_LINEAR_MCP_PACKAGE"],
+      "env": {
+        "LINEAR_API_KEY": "${env:LINEAR_API_KEY}"
       }
     }
   }

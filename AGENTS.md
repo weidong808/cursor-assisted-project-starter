@@ -2,9 +2,12 @@
 
 ## Mission
 
-This repository is a **Cursor control-layer starter** — seven configuration surfaces
-that turn a generic coding agent into a project-aware partner. Fork it, replace the
-TODOs, and delete examples you do not need.
+This repository is a **Cursor control-layer starter** — the seven configuration
+surfaces from the [AI in Action post](https://github.com/weidong808/cursor-assisted-project-starter)
+that turn a generic coding agent into a project-aware partner.
+
+Fork it into a real app repo, then replace the runtime TODOs below and delete
+examples you do not need.
 
 ## Before editing
 
@@ -13,25 +16,32 @@ TODOs, and delete examples you do not need.
 3. Prefer the smallest change that fully solves the task.
 4. Preserve public behavior unless the task explicitly changes it.
 
-## Architecture
+## Architecture (this starter repo)
 
-- Operating manual: `AGENTS.md`
-- Scoped rules: `.cursor/rules/*.mdc`
-- Workflows: `.cursor/commands/` (`/code-review`, `/ship`)
-- Expertise: `.cursor/skills/` (see `ship-check` for `disable-model-invocation`)
-- Specialists: `.cursor/agents/` (`code-reviewer`, `security-auditor`)
-- External tools: `.cursor/mcp.json` (copy from `mcp.example.json` when ready)
-- Enforcement: `.cursor/hooks.json` → `scripts/guard-command.sh`
-- Boundaries: `.cursorignore` (block) and `.cursorindexingignore` (de-index)
+| Surface | Path | Role |
+| --- | --- | --- |
+| Context | `AGENTS.md` | Operating manual — you are reading it |
+| Behavior | `.cursor/rules/*.mdc` | Scoped engineering decisions |
+| Tools | `.cursor/mcp.json` | Team MCP connections (empty by default) |
+| Workflow | `.cursor/commands/` | `/code-review`, `/ship` — you invoke |
+| Workflow | `.cursor/skills/` | Agent-loaded expertise; `ship-check` is manual-only |
+| Delegation | `.cursor/agents/` | `code-reviewer`, `security-auditor` subagents |
+| Enforcement | `.cursor/hooks.json` | Shell guard, secret scan, edit audit |
+| Boundary | `.cursorignore` | Block access entirely |
+| Boundary | `.cursorindexingignore` | De-index only; still readable on request |
 
-## Commands
+Copy `.cursor/mcp.example.json` → `.cursor/mcp.local.json` (gitignored) or merge
+servers into `.cursor/mcp.json` after pinning packages and setting env vars from
+`.env.example`.
 
-- Validate structure: `bash scripts/validate-starter.sh`
-- Install (when you add a runtime): `TODO`
-- Test (when you add a runtime): `TODO`
-- Lint / format / build: `TODO` — set these when copying into a real project
+## Commands (this repo)
 
-Never invent a command. Inspect package or build files first.
+- Validate structure and hooks: `bash scripts/validate-starter.sh`
+- Test shell guard: `printf '%s' '{"command":"rm -rf /"}' | bash .cursor/hooks/guard-command.sh`
+
+When you fork into an application repository, replace this section with your real
+install / lint / test / build commands. Never invent a command — read the project's
+package or build files first.
 
 ## Engineering boundaries
 

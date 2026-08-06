@@ -4,6 +4,7 @@
 !.env.example
 *.local
 .cursor/mcp.local.json
+.cursor/hooks/.edit-audit.log
 
 # Dependencies and build output
 node_modules/

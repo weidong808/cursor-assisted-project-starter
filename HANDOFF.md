@@ -1,60 +1,39 @@
 # Handoff — cursor-assisted-project-starter
 
 Companion repo for the **Seven Files That Never Ship to Production** LinkedIn
-post. Written for the next agent to pick up; cross-read
-`weidong-website/docs/linkedin-cursor-structure/HANDOFF.md` for the full picture.
+post. Cross-read
+`weidong-website/docs/linkedin-cursor-structure/HANDOFF.md` for the full
+three-surface publish chain (A → C → publish → B).
 
-## Scope — three surfaces, one story
-
-| Surface                                         | State                                      |
-| ----------------------------------------------- | ------------------------------------------ |
-| **A.** `weidong-website/docs/linkedin-cursor-structure/` — post package | ✅ complete (see website handoff) |
-| **B.** `weidong-website/src/` — hub integration | ❌ not started (website handoff task 5)    |
-| **C.** this repo — starter                      | ✅ public — `validate-starter.sh` passes |
-
-They depend on each other. The post (A) promises this repo in its first comment
-and on the card footer, so **C gates publication**. The hub card (B) needs a
-live LinkedIn URL, so it can only come last. Order is **A → C → publish → B**.
-
-## C. This repo — status
+## Status
 
 **Repo:** https://github.com/weidong808/cursor-assisted-project-starter  
 **Visibility:** public  
-**Validate:** `bash scripts/validate-starter.sh`
+**Validate:** `bash scripts/validate-starter.sh` (includes hook smoke tests)
 
-### Contract with the post
+## Contract with the post
 
-The caption names seven layers; the card tags them CONTEXT / BEHAVIOR / TOOLS /
-WORKFLOW / DELEGATION / ENFORCEMENT / BOUNDARY. This repo must use the same
-names and keep **hooks as the enforcement differentiator** — rules are advisory,
-hooks run.
+| Path | Status |
+| --- | --- |
+| `AGENTS.md` | Filled for this starter; runtime TODOs are for forking into app repos |
+| `.cursor/rules/` | 3 scoped `.mdc` files + 1 global baseline |
+| `.cursor/mcp.json` | Empty (safe default) + `mcp.example.json` (GitHub/Sentry/Linear via env) |
+| `.cursor/commands/` | `/code-review`, `/ship` |
+| `.cursor/skills/` | Auto `release-readiness` + manual `ship-check` (`disable-model-invocation`) |
+| `.cursor/agents/` | `code-reviewer`, `security-auditor` (readonly) |
+| `.cursor/hooks.json` | `beforeShellExecution`, `beforeReadFile`, `afterFileEdit` |
+| `.cursorignore` / `.cursorindexingignore` | Block vs de-index split from post item 7 |
 
-| Path                 | In repo                                           |
-| -------------------- | ------------------------------------------------- |
-| `AGENTS.md`          | Operating manual — replace TODOs when forking     |
-| `.cursor/rules/`     | Scoped `.mdc` rules                               |
-| `.cursor/mcp.json`   | Example MCP; secrets via env, not committed       |
-| `.cursor/commands/`  | Repeatable workflows                              |
-| `.cursor/skills/`    | Reusable expertise                                |
-| `.cursor/agents/`    | Focused subagents                                 |
-| `.cursor/hooks.json` | Deterministic guards (`scripts/guard-command.sh`) |
+Hooks live in `.cursor/hooks/` per Cursor convention. `guard-command.sh` parses
+JSON stdin (required by the hooks spec — raw-text parsing does not work).
 
-### Done means (publication gate)
+## Not in scope
 
-A reader who runs `git clone` gets a Cursor project where the agent behaves
-differently on the first prompt. When that holds, tick the blocker in
-`weidong-website/docs/linkedin-cursor-structure/PLAYBOOK.md` pre-flight and the
-post can ship as written.
-
-### Remaining work here
-
-1. **Fork customization** — replace runtime `TODO` commands in `AGENTS.md` when
-   copying into a real project (expected).
-2. **After publish (website task 5)** — prepend hub entry to `videos.ts` with the
-   live lnkd.in URL; GIF already staged on the site.
+- **`projects.ts` on weidong-shi.com** — template repo only; linked from the post
+  first comment, not listed as a Work app.
+- **Hub card** — website handoff task 5 after LinkedIn publish (`videos.ts` entry).
 
 ## Constraints
 
-- No secrets in git. Hooks improve consistency; they are not a security boundary.
-- Keep the repo small enough to read in ten minutes — a reference, not a framework.
-- Commit author for website deploys: `Weidong Shi <weidongshi@hotmail.com>`.
+- No secrets in git. Hooks are not a security boundary.
+- Small enough to read in ten minutes — a reference, not a framework.

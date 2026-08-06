@@ -1,42 +1,75 @@
 # Cursor-Assisted Project Starter
 
-A production-minded, reusable control layer for Cursor projects.
+A production-minded, reusable control layer for Cursor projects — the companion
+repo for **Seven Files That Never Ship to Production** (AI in Action).
 
-Most teams repeatedly explain architecture, conventions, tests, and safety boundaries to their coding agent. This starter moves that knowledge into the repository so Cursor can begin each task with useful context and deterministic guardrails.
+Most teams repeatedly explain architecture, conventions, tests, and safety
+boundaries to their coding agent. This starter moves that knowledge into the
+repository so Cursor can begin each task with useful context and deterministic
+guardrails.
 
-## The seven layers
+## Map to the post
 
-| Layer | Purpose |
-|---|---|
-| `AGENTS.md` | Project operating manual and definition of done |
-| `.cursor/rules/` | Persistent, scoped engineering decisions |
-| `.cursor/commands/` | Repeatable workflows invoked on demand |
-| `.cursor/skills/` | Reusable expertise loaded when relevant |
-| `.cursor/agents/` | Focused specialists with isolated responsibilities |
-| `.cursor/mcp.json` | Safe, project-level connections to external tools |
-| `.cursor/hooks.json` | Deterministic checks around agent actions |
-| `.cursorignore` / `.cursorindexingignore` | Block vs de-index boundaries |
+The LinkedIn caption lists **seven ideas**; the card lists **seven rows**. Item 4
+combines `commands/` and `skills/`; item 7 splits into `.cursorignore` and
+`.cursorindexingignore`. This repo implements all of them.
+
+| Post # | Card tag | What to open in this repo |
+| --- | --- | --- |
+| 1 | CONTEXT | `AGENTS.md` |
+| 2 | BEHAVIOR | `.cursor/rules/` (3 scoped `.mdc` examples) |
+| 3 | TOOLS | `.cursor/mcp.json` (empty) + `.cursor/mcp.example.json` |
+| 4 | WORKFLOW | `.cursor/commands/` **and** `.cursor/skills/` |
+| 5 | DELEGATION | `.cursor/agents/` |
+| 6 | ENFORCEMENT | `.cursor/hooks.json` → `.cursor/hooks/*.sh` |
+| 7 | BOUNDARY | `.cursorignore` + `.cursorindexingignore` |
+
+**Rules are advice. Hooks are enforcement.** Rules tell the agent what to do;
+hooks in this repo veto destructive shell commands, block reads of likely secrets,
+and audit agent edits.
 
 ## Start here
 
-1. Use this repository as a template or copy the files into an existing project.
-2. Replace every `TODO` with your project's actual commands and boundaries.
-3. Delete examples you do not need; focused context beats more context.
-4. Keep credentials out of git. Use environment variables or your approved secret manager.
-5. Run `bash scripts/validate-starter.sh`.
+1. Use this repository as a template or copy the `.cursor/` tree into an existing project.
+2. Read `AGENTS.md`, then run `bash scripts/validate-starter.sh`.
+3. Copy `.cursor/mcp.example.json` into a local MCP config; set env vars from `.env.example`.
+4. When forking into an app repo, replace the runtime command section in `AGENTS.md`.
+5. Delete examples you do not need — focused context beats more context.
 6. Ask Cursor to read `AGENTS.md` and propose project-specific refinements before coding.
+
+## File guide — what each piece does
+
+| Path | Purpose | Customize when |
+| --- | --- | --- |
+| `AGENTS.md` | Operating manual, architecture, commands, definition of done | Always — first file to rewrite for your stack |
+| `.cursor/rules/production-minded-changes.mdc` | Global baseline (`alwaysApply: true`) | Tune boundaries for your team |
+| `.cursor/rules/api-boundaries.mdc` | API/route conventions (glob-scoped) | Point globs at your API paths |
+| `.cursor/rules/testing-expectations.mdc` | Test quality bar (glob-scoped) | Match your test layout |
+| `.cursor/commands/code-review.md` | `/code-review` workflow | Align with your review checklist |
+| `.cursor/commands/ship.md` | `/ship` workflow | Point at your real validation commands |
+| `.cursor/skills/release-readiness/SKILL.md` | Auto-loaded release expertise | Trim for your deploy model |
+| `.cursor/skills/ship-check/SKILL.md` | Manual-only skill (`disable-model-invocation: true`) | Shows skills-as-commands pattern |
+| `.cursor/agents/code-reviewer.md` | Read-only correctness reviewer | Adjust focus areas |
+| `.cursor/agents/security-auditor.md` | Read-only security reviewer | Add org-specific threat model |
+| `.cursor/mcp.json` | Committed team MCP config | Add pinned servers after review |
+| `.cursor/mcp.example.json` | GitHub / Sentry / Linear shape with env vars | Replace placeholder packages |
+| `.cursor/hooks/guard-command.sh` | `beforeShellExecution` — blocks destructive commands | Add org-specific shell patterns |
+| `.cursor/hooks/scan-secrets.sh` | `beforeReadFile` — blocks likely secret reads | Tighten patterns for your stack |
+| `.cursor/hooks/audit-edit.sh` | `afterFileEdit` — append-only edit log | Swap for a real formatter if you have one |
+| `.cursorignore` | Block agent access (including @-mentions) | List secret and vendor paths |
+| `.cursorindexingignore` | De-index without blocking reads | List generated / vendored trees |
+| `scripts/validate-starter.sh` | Self-check for structure, JSON, and hook behavior | Extend for your app's CI commands |
 
 ## What is included
 
-- A concise operating manual
-- A scoped rule for production-minded changes plus API and testing examples
+- Three scoped rules plus one global baseline
 - `/code-review` and `/ship` commands
-- Release-readiness and manual-only `ship-check` skills
-- Read-only code-review and security-auditor subagents
-- A disabled-by-default MCP example using environment variables
-- Hooks plus portable validation scripts
-- `.cursorignore` and `.cursorindexingignore` with the block vs de-index split
-- A starter self-check and contribution guidance
+- Auto-loaded `release-readiness` and manual-only `ship-check` skills
+- Read-only `code-reviewer` and `security-auditor` subagents
+- Empty committed `mcp.json` plus a multi-server example using env vars
+- Three working hooks (shell guard, secret scan, edit audit)
+- Ignore split demonstrated concretely
+- `.env.example`, validation script, and contribution guidance
 
 ## Design principles
 
@@ -46,21 +79,15 @@ Most teams repeatedly explain architecture, conventions, tests, and safety bound
 - **Safe by default:** no secrets, destructive commands, or automatic external writes.
 - **Human accountable:** the agent proposes; the team reviews and owns the result.
 
-## Customize without creating noise
-
-Start with three questions:
-
-- What does every contributor need to know before changing this repository?
-- Which mistakes have already happened twice?
-- Which requirements can be checked deterministically?
-
-Encode the answers in the smallest appropriate layer. Do not turn the repository into a prompt archive.
-
 ## Security notes
 
-The MCP configuration is an inert example until you deliberately configure a server. Never commit API keys, tokens, private URLs, customer data, or machine-specific paths. Review any third-party MCP server and pin dependencies before enabling it.
+`mcp.json` ships empty so cloning is safe. Enable MCP only after pinning packages
+and setting env vars locally. Never commit API keys, tokens, private URLs, customer
+data, or machine-specific paths.
 
-Hooks improve consistency, but they are not a security boundary. Keep branch protection, CI checks, code review, secret scanning, and least-privilege credentials in place.
+Hooks improve consistency, but they are not a security boundary. Keep branch
+protection, CI checks, code review, secret scanning, and least-privilege credentials
+in place.
 
 ## Official references
 
