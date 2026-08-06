@@ -1,6 +1,7 @@
 {
   "mcpServers": {
     "github": {
+      "type": "stdio",
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-github"],
       "env": {
@@ -8,6 +9,7 @@
       }
     },
     "sentry": {
+      "type": "stdio",
       "command": "npx",
       "args": ["-y", "REPLACE_WITH_PINNED_SENTRY_MCP_PACKAGE"],
       "env": {
@@ -15,6 +17,7 @@
       }
     },
     "linear": {
+      "type": "stdio",
       "command": "npx",
       "args": ["-y", "REPLACE_WITH_PINNED_LINEAR_MCP_PACKAGE"],
       "env": {

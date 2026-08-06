@@ -1,0 +1,14 @@
+---
+description: Require a written plan before multi-file or high-risk changes. Use for features, refactors, migrations, or anything beyond a one-line fix.
+alwaysApply: false
+---
+
+# Plan before change
+
+For any task beyond a one-line fix:
+
+1. Output a short plan — files touched, steps, risks, and open questions.
+2. Wait for approval before editing when scope is ambiguous or touches auth, billing, data, or deploy config.
+3. Prefer Cursor Plan Mode when the change spans multiple modules.
+
+Do not start wide refactors without explicit approval.

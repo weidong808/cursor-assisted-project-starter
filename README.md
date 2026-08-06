@@ -7,19 +7,19 @@ every agent session. This starter encodes them once — rules, skills, subagents
 hooks, and ignore boundaries — so Cursor starts with useful context and
 deterministic guardrails.
 
-**Adopting in your app?** Start with [ADOPT.md](./ADOPT.md).
+**Adopting in your app?** [ADOPT.md](./ADOPT.md) · **Enterprise?** [ENTERPRISE.md](./ENTERPRISE.md) · **Security model?** [SECURITY.md](./SECURITY.md)
 
 ## What's in the box
 
 | Surface | Location | Cursor behavior |
 | --- | --- | --- |
 | Context | `AGENTS.md` | Operating manual (rewrite per app) |
-| Rules | `.cursor/rules/*.mdc` | Always-on + file-scoped behavior |
+| Rules | `.cursor/rules/*.mdc` | 2 always-on + 3 scoped + 3 agent-selected |
 | Commands | `.cursor/commands/*.md` | `/code-review`, `/ship` |
 | Skills | `.cursor/skills/*/SKILL.md` | Auto-loaded or manual-only expertise |
 | Subagents | `.cursor/agents/*.md` | Isolated reviewers (readonly) |
 | MCP | `.cursor/mcp.json` + example | Team tool connections via env vars |
-| Hooks | `.cursor/hooks.json` + scripts | Enforcement — shell guard, secret scan, edit audit |
+| Hooks | `.cursor/hooks.json` + scripts | 5 hooks — prompt, read, shell, MCP, edit audit |
 | Boundaries | `.cursorignore`, `.cursorindexingignore` | Block vs de-index |
 
 **Rules advise. Hooks enforce.** That split is intentional.
@@ -43,6 +43,10 @@ Then open in Cursor → **Customize** → confirm rules, skills, and agents load
 | `protect-sensitive-paths.mdc` | Add app-specific sensitive paths |
 | `api-boundaries.mdc` | Point globs at your API/actions layer |
 | `testing-expectations.mdc` | Point globs at your test files |
+| `database-migrations.mdc` | SQL/migration paths |
+| `plan-before-change.mdc` | Agent-selected — plan before multi-file work |
+| `verify-before-done.mdc` | Agent-selected — run real CI before "done" |
+| `small-focused-diffs.mdc` | Agent-selected — minimal diffs |
 | `.cursor/commands/*` | Align with your review/ship checklist |
 | `.cursor/skills/*` | Trim or extend workflows |
 | `.cursor/agents/*` | Tune delegation descriptions |

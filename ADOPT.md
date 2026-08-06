@@ -6,7 +6,7 @@ Use this checklist when copying the control layer into a project such as
 ## 1. Copy these paths
 
 ```text
-AGENTS.md                 # rewrite — do not copy verbatim
+AGENTS.md                 # start from templates/AGENTS.app.md — do not copy verbatim
 .cursor/
   rules/
   commands/
@@ -22,9 +22,11 @@ AGENTS.md                 # rewrite — do not copy verbatim
 scripts/validate-starter.sh   # rename or extend (see step 5)
 ```
 
-Do **not** copy `HANDOFF.md`, `ADOPT.md`, or LinkedIn-specific docs unless you want them.
+Do **not** copy `HANDOFF.md` or LinkedIn-specific docs. **Do** read [SECURITY.md](./SECURITY.md) and [ENTERPRISE.md](./ENTERPRISE.md) before enabling hooks in production repos.
 
 ## 2. Rewrite `AGENTS.md` first
+
+Start from [templates/AGENTS.app.md](./templates/AGENTS.app.md).
 
 Replace the architecture and commands sections with facts from the target repo:
 
@@ -141,3 +143,19 @@ Open **Customize → Rules / Skills / Agents** in Cursor and confirm everything 
 | **HabitCheck / RetireCheck / etc.** | Domain boundaries in `AGENTS.md`; PWA/offline rules if needed |
 
 These are starting points — refine after the first agent session on each repo.
+
+## 11. Enterprise rollout
+
+For teams with Cursor Enterprise, pair this repo with dashboard controls —
+see [ENTERPRISE.md](./ENTERPRISE.md) for the full mapping.
+
+| Phase | Action |
+| --- | --- |
+| Pilot | One non-critical repo + `AGENTS.md` + ignore files |
+| Steer | Always-on rules + agent-selected rules; keep always-on count ≤ 3 |
+| Enforce | Enable hooks; set `failClosed: true` on prompt/MCP guards |
+| Scale | Team Rules in dashboard for org non-negotiables; MCP allowlist |
+| Monitor | Audit logs → SIEM; extend `audit-edit.sh` or use hook → DLP API |
+
+**Context budget:** Prefer scoped rules over more always-on rules. Enterprise
+research recommends the narrowest activation mode that still fires when needed.

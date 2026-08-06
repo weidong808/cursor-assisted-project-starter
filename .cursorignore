@@ -1,9 +1,18 @@
 ﻿# Block access entirely — @-mentions included.
-# Put secrets and credentials here.
+# .cursorignore is NOT a security boundary (see SECURITY.md).
+# Pair with hooks, approvals, and filesystem permissions.
 
+# Secrets and credentials
 .env
 .env.*
-*.pem
-*.key
-*.p12
+!.env.example
+**/credentials.json
+**/secrets.json
+**/*.pem
+**/*.key
+**/*.p12
+**/id_rsa
 .cursor/mcp.local.json
+
+# Local overrides
+*.local

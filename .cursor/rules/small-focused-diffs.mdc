@@ -1,0 +1,11 @@
+---
+description: Keep diffs minimal and reviewable; avoid drive-by refactors and file-wide rewrites unless explicitly requested.
+alwaysApply: false
+---
+
+# Small, focused diffs
+
+- Change the minimum necessary to solve the task.
+- No unrelated refactors, renames, or formatting sweeps in the same diff.
+- Read two similar existing files before adding a new module; match structure and naming.
+- Reference canonical files with `@path` instead of re-describing patterns in prose.

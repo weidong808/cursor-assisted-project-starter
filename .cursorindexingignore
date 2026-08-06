@@ -1,8 +1,16 @@
 # De-index only — files stay readable when explicitly requested.
-# Put vendored and generated output here.
+# Reduces search noise in large repos; does not block agent reads.
 
 node_modules/
 dist/
 build/
 coverage/
+.next/
+.nuxt/
+.cache/
 .git/
+**/*.lock
+**/*.lockb
+package-lock.json
+pnpm-lock.yaml
+yarn.lock

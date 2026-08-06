@@ -1,14 +1,28 @@
 {
   "version": 1,
   "hooks": {
-    "beforeShellExecution": [
+    "beforeSubmitPrompt": [
       {
-        "command": "bash .cursor/hooks/guard-command.sh"
+        "command": "bash .cursor/hooks/scan-prompt.sh",
+        "failClosed": true
       }
     ],
     "beforeReadFile": [
       {
-        "command": "bash .cursor/hooks/scan-secrets.sh"
+        "command": "bash .cursor/hooks/scan-secrets.sh",
+        "failClosed": false
+      }
+    ],
+    "beforeShellExecution": [
+      {
+        "command": "bash .cursor/hooks/guard-command.sh",
+        "failClosed": false
+      }
+    ],
+    "beforeMCPExecution": [
+      {
+        "command": "bash .cursor/hooks/guard-mcp.sh",
+        "failClosed": true
       }
     ],
     "afterFileEdit": [

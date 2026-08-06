@@ -1,26 +1,30 @@
 # Handoff — cursor-assisted-project-starter
 
-**Status: finalized** — Cursor-accurate reference template. Post copy is separate;
-refine on `weidong-website` when ready.
+**Status: finalized (enterprise-aligned)** — ready to adopt into app repos.
+Post copy on `weidong-website` is separate.
 
-## For agents
+## Documentation map
 
-| Doc | Use |
+| Doc | Audience |
 | --- | --- |
-| [README.md](./README.md) | Overview and file guide |
-| [ADOPT.md](./ADOPT.md) | Copy into app repos (ArchLens, hub site, etc.) |
-| [AGENTS.md](./AGENTS.md) | Operating manual — rewrite per target app |
-| [.cursor/hooks/README.md](./.cursor/hooks/README.md) | Hook behavior and smoke tests |
+| [README.md](./README.md) | Overview |
+| [ADOPT.md](./ADOPT.md) | Copy into ArchLens, hub site, etc. |
+| [ENTERPRISE.md](./ENTERPRISE.md) | Maps to Cursor security hardening checklist |
+| [SECURITY.md](./SECURITY.md) | Steering vs enforcement; ignore limits |
+| [templates/AGENTS.app.md](./templates/AGENTS.app.md) | Blank AGENTS.md for app repos |
 
 **Validate:** `bash scripts/validate-starter.sh`
 
-## Publish chain (website)
+## Coverage summary
 
-See `weidong-website/docs/linkedin-cursor-structure/HANDOFF.md` for A → C → publish → B.
-This repo is surface **C**. Not listed in `projects.ts` — linked from the post first comment only.
+- **8 rules** — 2 always-on, 3 glob-scoped, 3 agent-selected
+- **2 commands** + **2 skills** (auto + manual-only)
+- **2 readonly subagents**
+- **5 hooks** — prompt, read, shell, MCP, edit audit
+- **MCP** — empty committed config + stdio example with env interpolation
+- **Ignore split** — block vs de-index
 
-## Constraints
+## Not in scope
 
-- No secrets in git
-- Skill folder name must match `name:` in frontmatter
-- Keep the template readable in ~10 minutes — reference, not a framework
+- `projects.ts` on weidong-shi.com (template repo; linked from post first comment)
+- Hub `videos.ts` entry (after LinkedIn publish)

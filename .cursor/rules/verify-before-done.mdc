@@ -1,0 +1,14 @@
+---
+description: Definition of done requires running real project validation from AGENTS.md — never claim completion without evidence.
+alwaysApply: false
+---
+
+# Verify before done
+
+A task is **not** complete until:
+
+1. The requested behavior is implemented.
+2. You ran the applicable commands from `AGENTS.md` (lint, typecheck, test, build — only what exists).
+3. You report what passed, what was skipped, and why.
+
+Do not invent validation steps this repository does not use. Do not say "should pass" — run the commands or state that you could not.
