@@ -1,52 +1,51 @@
 #!/usr/bin/env bash
-set -euo pipefail
+# beforeReadFile — refuse to feed likely secret material to the model.
+#
+# Pure bash, like the other hooks. Nothing in .cursor/hooks/ depends on an
+# interpreter being installed: these run anywhere bash runs, which is the only
+# way a hook can be trusted to answer on every machine that clones this repo.
+#
+# failClosed is false for this one, so a crash would only cost a retry — but it
+# still prints on every path. Silence from a hook is never useful.
 
-input="$(cat)"
+set -uo pipefail
 
-INPUT="$input" python3 -c '
-import json
-import os
-import re
-import sys
+emit() {
+  printf '%s\n' "$1"
+  exit 0
+}
 
-payload = json.loads(os.environ["INPUT"])
-file_path = payload.get("file_path", "")
-content = payload.get("content", "")
+input="$(cat 2>/dev/null || true)"
 
-allow = {"permission": "allow"}
+file_path="$(printf '%s' "$input" \
+  | grep -oE '"file_path"[[:space:]]*:[[:space:]]*"[^"]*"' \
+  | head -n 1 | cut -d'"' -f4 2>/dev/null || true)"
+basename="${file_path##*/}"
+basename="${basename##*\\}"
 
-basename = file_path.replace("\\", "/").split("/")[-1]
-skip_files = {"validate-starter.sh", "scan-secrets.sh", "scan-prompt.sh", "guard-mcp.sh", "mcp.example.json"}
-if basename in skip_files or basename.endswith(".example") or basename.endswith(".sample"):
-    print(json.dumps(allow))
-    sys.exit(0)
+# Files that legitimately contain credential-shaped text: this repo's own
+# scanners, and the example/sample files that exist to show shape.
+case "$basename" in
+  validate-starter.sh | scan-secrets.sh | scan-prompt.sh | guard-mcp.sh | guard-command.sh)
+    emit '{"permission":"allow"}'
+    ;;
+  *.example | *.sample | mcp.example.json)
+    emit '{"permission":"allow"}'
+    ;;
+esac
 
-high_confidence = [
-    re.compile(r"AKIA[0-9A-Z]{16}"),
-    re.compile(r"sk_(live|test)_[0-9a-zA-Z]{16,}"),
-    re.compile(r"-----BEGIN (RSA |EC )?PRIVATE KEY-----"),
-]
+# Live secret material, wherever it appears in the payload.
+secret_pattern='AKIA[0-9A-Z]{16}|sk_(live|test)_[0-9a-zA-Z]{16,}|gh[pousr]_[A-Za-z0-9_]{20,}|-----BEGIN( [A-Z]+)* PRIVATE KEY-----'
 
-for pattern in high_confidence:
-    if pattern.search(content):
-        print(json.dumps({
-            "permission": "deny",
-            "user_message": (
-                f"Blocked read of likely secret material in {basename}. "
-                "Store secrets in env vars and list paths in .cursorignore."
-            ),
-        }))
-        sys.exit(0)
+if printf '%s' "$input" | grep -Eq "$secret_pattern" 2>/dev/null; then
+  emit "{\"permission\":\"deny\",\"user_message\":\"Blocked read of likely secret material in ${basename:-that file}. Store secrets in env vars and list the paths in .cursorignore.\"}"
+fi
 
-if basename == ".env" or (basename.startswith(".env.") and not basename.endswith(".example")):
-    print(json.dumps({
-        "permission": "deny",
-        "user_message": (
-            f"Blocked read of {basename}. Use .env.example for shape; "
-            "keep live values out of the repo."
-        ),
-    }))
-    sys.exit(0)
+# Real env files, whatever they contain. .env.example is allowed above.
+case "$basename" in
+  .env | .env.*)
+    emit "{\"permission\":\"deny\",\"user_message\":\"Blocked read of ${basename}. Use .env.example for shape; keep live values out of the repo.\"}"
+    ;;
+esac
 
-print(json.dumps(allow))
-'
+emit '{"permission":"allow"}'

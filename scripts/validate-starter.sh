@@ -1,5 +1,16 @@
 #!/usr/bin/env bash
-set -euo pipefail
+# Structural and behavioural checks for the starter.
+#
+# Everything here runs without python3. The previous version gated its hook
+# tests behind `command -v python3`, which is exactly the condition under which
+# the hooks break — so on the machines that needed the check most, it skipped
+# the tests and reported success.
+
+set -uo pipefail
+
+failed=0
+
+# ---------------------------------------------------------------- structure --
 
 required=(
   "AGENTS.md"
@@ -8,6 +19,7 @@ required=(
   "ENTERPRISE.md"
   "templates/AGENTS.app.md"
   ".env.example"
+  ".gitattributes"
   ".cursorignore"
   ".cursorindexingignore"
   ".cursor/rules/production-minded-changes.mdc"
@@ -35,7 +47,6 @@ required=(
   ".cursor/hooks/README.md"
 )
 
-failed=0
 for file in "${required[@]}"; do
   if [[ ! -s "$file" ]]; then
     printf 'Missing or empty: %s\n' "$file"
@@ -43,56 +54,127 @@ for file in "${required[@]}"; do
   fi
 done
 
-if command -v python3 >/dev/null 2>&1; then
-  python3 -m json.tool .cursor/mcp.json >/dev/null
-  python3 -m json.tool .cursor/mcp.example.json >/dev/null
-  python3 -m json.tool .cursor/hooks.json >/dev/null
-else
-  printf 'Warning: python3 unavailable; JSON syntax was not checked.\n'
-fi
+# ------------------------------------------------------------ hook hygiene --
+
+CR="$(printf '\r')"
+
+while IFS= read -r script; do
+  # The outage this check exists for: scan-prompt.sh was commented out top to
+  # bottom. It ran, printed nothing, and failClosed blocked every prompt.
+  if ! grep -qE '^[[:space:]]*[^#[:space:]]' "$script"; then
+    printf 'Hook has no executable lines (entirely commented out?): %s\n' "$script"
+    failed=1
+  fi
+  if LC_ALL=C grep -q "$CR" "$script"; then
+    printf 'Hook has CRLF line endings; bash will fail on it: %s\n' "$script"
+    failed=1
+  fi
+done < <(find .cursor/hooks -name '*.sh' | sort)
+
+# A hook that cannot print is a lockout when failClosed is set. None of them may
+# depend on anything that might be missing, or exit before printing.
+for script in .cursor/hooks/*.sh; do
+  # Strip comments first — the scripts explain in prose why they avoid these.
+  if grep -vE '^[[:space:]]*#' "$script" | grep -qE '\b(python3?|node|perl|ruby)\b'; then
+    printf 'Hook depends on an interpreter (breaks where it is missing): %s\n' "$script"
+    failed=1
+  fi
+  if grep -qE '^[[:space:]]*set -[a-z]*e' "$script"; then
+    printf 'Hook uses set -e and may exit before printing: %s\n' "$script"
+    failed=1
+  fi
+done
+
+# ---------------------------------------------------------- hook behaviour --
+
+assert_hook() {
+  local label="$1" script="$2" payload="$3" expect="$4" out
+  out="$(printf '%s' "$payload" | bash "$script" 2>/dev/null)"
+  if [[ -z "$out" ]]; then
+    printf 'Hook produced NO OUTPUT (fails closed): %s — %s\n' "$script" "$label"
+    failed=1
+  elif ! printf '%s' "$out" | grep -q "$expect"; then
+    printf 'Hook assertion failed: %s — %s\n  expected: %s\n  got:      %s\n' \
+      "$script" "$label" "$expect" "$out"
+    failed=1
+  fi
+}
+
+assert_hook "denies destructive command" .cursor/hooks/guard-command.sh \
+  '{"command":"rm -rf /"}' '"permission":"deny"'
+assert_hook "allows safe command" .cursor/hooks/guard-command.sh \
+  '{"command":"npm test"}' '"permission":"allow"'
+assert_hook "blocks secret-like prompt" .cursor/hooks/scan-prompt.sh \
+  '{"prompt":"key sk_live_abcdefghijklmnopqrst"}' '"continue":false'
+assert_hook "allows safe prompt" .cursor/hooks/scan-prompt.sh \
+  '{"prompt":"refactor the auth module"}' '"continue":true'
+assert_hook "blocks AWS key in prompt" .cursor/hooks/scan-prompt.sh \
+  '{"prompt":"use AKIAIOSFODNN7EXAMPLE"}' '"continue":false'
+assert_hook "denies credential in MCP args" .cursor/hooks/guard-mcp.sh \
+  '{"tool_name":"db","tool_input":"AKIAIOSFODNN7EXAMPLE"}' '"permission":"deny"'
+assert_hook "allows clean MCP call" .cursor/hooks/guard-mcp.sh \
+  '{"tool_name":"db","tool_input":"select 1"}' '"permission":"allow"'
+assert_hook "allows ordinary file read" .cursor/hooks/scan-secrets.sh \
+  '{"file_path":"src/app.ts","content":"export const x = 1;"}' '"permission":"allow"'
+assert_hook "empty payload still answers" .cursor/hooks/scan-prompt.sh \
+  '' '"continue":true'
+
+# ------------------------------------------------------------------ content --
 
 while IFS= read -r skill_file; do
   dir_name="$(basename "$(dirname "$skill_file")")"
-  skill_name="$(python3 -c "import re, pathlib; t=pathlib.Path('$skill_file').read_text(); m=re.search(r'^name:\\s*(.+)$', t, re.M); print(m.group(1).strip() if m else '')")"
+  skill_name="$(grep -m1 -E '^name:[[:space:]]*' "$skill_file" \
+    | sed -e 's/^name:[[:space:]]*//' -e 's/[[:space:]]*$//' | tr -d '\r')"
   if [[ -z "$skill_name" || "$dir_name" != "$skill_name" ]]; then
     printf 'Skill folder/name mismatch: %s vs %s\n' "$dir_name" "$skill_name"
     failed=1
   fi
 done < <(find .cursor/skills -name SKILL.md | sort)
 
-if grep -RIEq '(api[_-]?key|secret|token)[[:space:]]*[:=][[:space:]]*["'"'"'][A-Za-z0-9_./+=-]{12,}' .   --exclude-dir=.git --exclude='mcp.example.json' --exclude='validate-starter.sh' --exclude='scan-secrets.sh' --exclude='scan-prompt.sh' --exclude='guard-mcp.sh'; then
-  printf 'Potential hard-coded secret found.\n'
-  failed=1
-fi
-
 if ! grep -q 'disable-model-invocation: true' .cursor/skills/ship-check/SKILL.md; then
   printf 'Missing disable-model-invocation on ship-check skill.\n'
   failed=1
 fi
 
-if command -v python3 >/dev/null 2>&1; then
-  deny="$(printf '%s' '{"command":"rm -rf /"}' | bash .cursor/hooks/guard-command.sh)"
-  if ! printf '%s' "$deny" | python3 -c "import json,sys; d=json.load(sys.stdin); sys.exit(0 if d.get('permission')=='deny' else 1)"; then
-    printf 'guard-command.sh did not deny a destructive command.\n'
-    failed=1
-  fi
-
-  block="$(printf '%s' '{"prompt":"key sk_live_abcdefghijklmnopqrst"}' | bash .cursor/hooks/scan-prompt.sh)"
-  if ! printf '%s' "$block" | python3 -c "import json,sys; d=json.load(sys.stdin); sys.exit(0 if d.get('continue') is False else 1)"; then
-    printf 'scan-prompt.sh did not block a secret-like prompt.\n'
-    failed=1
-  fi
-
-  allow_prompt="$(printf '%s' '{"prompt":"refactor the auth module"}' | bash .cursor/hooks/scan-prompt.sh)"
-  if ! printf '%s' "$allow_prompt" | python3 -c "import json,sys; d=json.load(sys.stdin); sys.exit(0 if d.get('continue') is True else 1)"; then
-    printf 'scan-prompt.sh blocked a safe prompt.\n'
-    failed=1
-  fi
-else
-  printf 'Warning: python3 unavailable; hook behavior was not checked.\n'
+if grep -RIEq '(api[_-]?key|secret|token)[[:space:]]*[:=][[:space:]]*["'"'"'][A-Za-z0-9_./+=-]{12,}' . \
+  --exclude-dir=.git --exclude='mcp.example.json' --exclude='validate-starter.sh' \
+  --exclude='scan-secrets.sh' --exclude='scan-prompt.sh' --exclude='guard-mcp.sh'; then
+  printf 'Potential hard-coded secret found.\n'
+  failed=1
 fi
 
+# JSON syntax, when a working parser happens to be available. Advisory only.
+#
+# `command -v python3` is not enough: a name can resolve to a stub that exits
+# non-zero (common on Windows). Prove the parser works on known-good input
+# before trusting its verdict — the same mistake the hooks used to make.
+json_parser=""
+if command -v python3 >/dev/null 2>&1 && printf '{}' | python3 -m json.tool >/dev/null 2>&1; then
+  json_parser="python3 -m json.tool"
+elif command -v node >/dev/null 2>&1 && node -e 'JSON.parse("{}")' >/dev/null 2>&1; then
+  json_parser="node_json"
+fi
+
+if [[ -n "$json_parser" ]]; then
+  for json in .cursor/mcp.json .cursor/mcp.example.json .cursor/hooks.json; do
+    if [[ "$json_parser" == "node_json" ]]; then
+      ok=$(node -e "require('fs').readFileSync('$json','utf8') && JSON.parse(require('fs').readFileSync('$json','utf8')); console.log('ok')" 2>/dev/null)
+    else
+      ok=$(python3 -m json.tool "$json" >/dev/null 2>&1 && echo ok)
+    fi
+    if [[ "$ok" != *ok* ]]; then
+      printf 'Invalid JSON: %s\n' "$json"
+      failed=1
+    fi
+  done
+else
+  printf 'Note: no working JSON parser found; syntax not checked (hooks were).\n'
+fi
+
+# ------------------------------------------------------------------- result --
+
 if [[ "$failed" -ne 0 ]]; then
+  printf '\nValidation FAILED.\n'
   exit 1
 fi
 

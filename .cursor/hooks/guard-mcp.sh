@@ -1,30 +1,29 @@
 #!/usr/bin/env bash
-set -euo pipefail
+# beforeMCPExecution — block MCP calls whose arguments carry live credentials.
+#
+# Also failClosed in .cursor/hooks.json, so the same rules as scan-prompt.sh
+# apply: pure bash, no `set -e`, exactly one JSON object printed on every path.
+# A missing `python3` must never be able to stop MCP calls from running.
 
-input="$(cat)"
+set -uo pipefail
 
-INPUT="$input" python3 -c '
-import json
-import os
-import re
-import sys
+emit() {
+  printf '%s\n' "$1"
+  exit 0
+}
 
-payload = json.loads(os.environ["INPUT"])
-tool_name = payload.get("tool_name", "")
-tool_input = payload.get("tool_input", "") or ""
+input="$(cat 2>/dev/null || true)"
 
-if re.search(
-    r"(AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9_]{20,}|sk_(live|test)_[0-9a-zA-Z]{16,})",
-    tool_input,
-):
-    print(json.dumps({
-        "permission": "deny",
-        "user_message": (
-            f"MCP tool \"{tool_name}\" blocked: arguments appear to contain "
-            "live credentials. Pass env var names, not values."
-        ),
-    }))
-    sys.exit(0)
+# Best-effort tool name for the message. Never fatal if it can't be found.
+tool_name="$(printf '%s' "$input" \
+  | grep -oE '"tool_name"[[:space:]]*:[[:space:]]*"[^"]*"' \
+  | head -n 1 | cut -d'"' -f4 2>/dev/null || true)"
+[ -n "$tool_name" ] || tool_name="(unknown)"
 
-print(json.dumps({"permission": "allow"}))
-'
+credential_pattern='AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9_]{20,}|sk_(live|test)_[0-9a-zA-Z]{16,}|xox[abposr]-[A-Za-z0-9-]{10,}|-----BEGIN( [A-Z]+)* PRIVATE KEY-----'
+
+if printf '%s' "$input" | grep -Eq "$credential_pattern" 2>/dev/null; then
+  emit "{\"permission\":\"deny\",\"user_message\":\"MCP tool ${tool_name} blocked: arguments appear to contain live credentials. Pass env var names, not values.\"}"
+fi
+
+emit '{"permission":"allow"}'

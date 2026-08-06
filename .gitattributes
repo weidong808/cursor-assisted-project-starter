@@ -1,0 +1,14 @@
+# Hooks are executed by bash. If a Windows checkout writes CRLF into a .sh file,
+# bash fails with `$'\r': command not found` — which for a failClosed hook means
+# every prompt is blocked and the agent is unusable. Force LF on everything
+# executable, and normalise text generally.
+* text=auto eol=lf
+*.sh text eol=lf
+*.mdc text eol=lf
+*.json text eol=lf
+
+# Binary assets — never apply text/EOL normalisation.
+*.png binary
+*.jpg binary
+*.gif binary
+*.pdf binary
