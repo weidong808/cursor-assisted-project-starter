@@ -1,0 +1,17 @@
+---
+description: Production-minded implementation standards
+globs:
+  - "**/*"
+alwaysApply: true
+---
+
+# Production-minded changes
+
+- Inspect neighboring code and tests before editing.
+- Follow existing architecture and naming unless the task explicitly changes them.
+- Validate at system boundaries; keep domain logic independent of transport details.
+- Handle failures explicitly without exposing secrets or internal implementation details.
+- Add or update tests for observable behavior, including meaningful failure cases.
+- Avoid unrelated refactors and dependency additions.
+- Do not claim a check passed unless it was actually run.
+- End with the outcome, validation evidence, and remaining risks.
