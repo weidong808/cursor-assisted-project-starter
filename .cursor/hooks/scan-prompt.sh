@@ -42,7 +42,7 @@ labels=(
 
 for i in "${!patterns[@]}"; do
   if printf '%s' "$input" | grep -Eq "${patterns[$i]}" 2>/dev/null; then
-    emit "{\"continue\":false,\"user_message\":\"Prompt appears to contain ${labels[$i]}. Remove the secret from chat — reference the env var name instead, and list secret paths in .cursorignore.\"}"
+    emit "{\"continue\":false,\"user_message\":\"Prompt appears to contain ${labels[$i]}. Remove the secret from chat — reference the env var name instead, and list secret paths in .cursorignore.\",\"agent_message\":\"The prompt contains what looks like ${labels[$i]}. Never paste live credentials into chat — reference the env var name (e.g. OPENAI_API_KEY) and ensure secret paths are in .cursorignore. Do not retry with the secret re-encoded or split.\"}"
   fi
 done
 

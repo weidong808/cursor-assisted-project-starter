@@ -37,7 +37,7 @@ Research consensus ([Cursor docs](https://cursor.com/docs/rules), [agentskills.i
 | Mode | Frontmatter | When to use |
 | --- | --- | --- |
 | Always | `alwaysApply: true` | Universal baselines only (keep count low) |
-| File-scoped | `globs: "..."` | API rules, test rules, migration rules |
+| File-scoped | `globs: **/api/**,**/tests/**` | API rules, test rules, migration rules (bare, comma-separated — no quotes) |
 | Agent-selected | `description: "..."` | Plan-first, verify-before-done |
 | Manual | no globs, no description | Rare policies invoked with `@rule-name` |
 

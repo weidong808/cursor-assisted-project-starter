@@ -4,6 +4,7 @@
 # executable, and normalise text generally.
 * text=auto eol=lf
 *.sh text eol=lf
+*.md text eol=lf
 *.mdc text eol=lf
 *.json text eol=lf
 

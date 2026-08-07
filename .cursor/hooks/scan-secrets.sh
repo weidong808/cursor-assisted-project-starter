@@ -22,6 +22,14 @@ file_path="$(printf '%s' "$input" \
   | head -n 1 | cut -d'"' -f4 2>/dev/null || true)"
 basename="${file_path##*/}"
 basename="${basename##*\\}"
+normalized="${file_path//\\//}"
+
+# Hook docs include intentional smoke-test patterns — must stay readable.
+case "$normalized" in
+  .cursor/hooks/README.md | */.cursor/hooks/README.md)
+    emit '{"permission":"allow"}'
+    ;;
+esac
 
 # Files that legitimately contain credential-shaped text: this repo's own
 # scanners, and the example/sample files that exist to show shape.
@@ -38,13 +46,13 @@ esac
 secret_pattern='AKIA[0-9A-Z]{16}|sk_(live|test)_[0-9a-zA-Z]{16,}|gh[pousr]_[A-Za-z0-9_]{20,}|-----BEGIN( [A-Z]+)* PRIVATE KEY-----'
 
 if printf '%s' "$input" | grep -Eq "$secret_pattern" 2>/dev/null; then
-  emit "{\"permission\":\"deny\",\"user_message\":\"Blocked read of likely secret material in ${basename:-that file}. Store secrets in env vars and list the paths in .cursorignore.\"}"
+  emit "{\"permission\":\"deny\",\"user_message\":\"Blocked read of likely secret material in ${basename:-that file}. Store secrets in env vars and list the paths in .cursorignore.\",\"agent_message\":\"${basename:-That file} appears to contain live credential material. Do not read it into context — reference env var names instead and ensure the path is listed in .cursorignore. Do not work around this guard.\"}"
 fi
 
 # Real env files, whatever they contain. .env.example is allowed above.
 case "$basename" in
   .env | .env.*)
-    emit "{\"permission\":\"deny\",\"user_message\":\"Blocked read of ${basename}. Use .env.example for shape; keep live values out of the repo.\"}"
+    emit "{\"permission\":\"deny\",\"user_message\":\"Blocked read of ${basename}. Use .env.example for shape; keep live values out of the repo.\",\"agent_message\":\"Live env files must not enter agent context. Use .env.example for variable names and shapes only.\"}"
     ;;
 esac
 

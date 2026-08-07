@@ -118,6 +118,8 @@ assert_hook "allows ordinary file read" .cursor/hooks/scan-secrets.sh \
   '{"file_path":"src/app.ts","content":"export const x = 1;"}' '"permission":"allow"'
 assert_hook "empty payload still answers" .cursor/hooks/scan-prompt.sh \
   '' '"continue":true'
+assert_hook "allows hooks README with doc examples" .cursor/hooks/scan-secrets.sh \
+  '{"file_path":".cursor/hooks/README.md","content":"token sk_live_abc123def456ghi789"}' '"permission":"allow"'
 
 # ------------------------------------------------------------- file hygiene --
 
